@@ -1,9 +1,26 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
+dist-ssr/
+
+# Local-only source assets (raw 3D model, renders, recordings)
+raw-assets/
 
 # Generated debug/test artifacts
-site/screenshots/
+screenshots/
 
-.DS_Store
+# Logs
+logs/
 *.log
-.git-publish.sh
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Editor and OS files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.local

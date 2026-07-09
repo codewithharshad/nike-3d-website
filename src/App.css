@@ -1,0 +1,630 @@
+/* ---------- Dark act (traction section) ---------- */
+body.theme-dark {
+  --ink: #f4f4f2;
+  --muted: #a3a3a3;
+  --bg: #111113;
+}
+
+.feature__body h2,
+.feature__body p,
+.feature__stats strong,
+.feature__stats span,
+.marquee {
+  transition: color 0.5s ease;
+}
+
+/* ---------- Loader ---------- */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: #f4f4f2;
+  transition: opacity 0.7s ease, visibility 0.7s;
+}
+
+.loader--done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader__mark {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 48px);
+  letter-spacing: 0.35em;
+  padding-left: 0.35em;
+  color: #101010;
+}
+
+.loader__bar {
+  width: 180px;
+  height: 2px;
+  background: #ddd;
+  overflow: hidden;
+  position: relative;
+  display: block;
+}
+
+.loader__bar-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.loader__pct {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: #888;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Fixed 3D canvas ---------- */
+.canvas-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+.canvas-wrap canvas {
+  touch-action: pan-y;
+}
+
+body.is-dragging .canvas-wrap {
+  cursor: grabbing;
+}
+
+/* ---------- Film grain (static texture — animating it strobes the screen) ---------- */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Custom cursor ---------- */
+@media (hover: hover) and (pointer: fine) {
+  body,
+  body a,
+  body button {
+    cursor: none;
+  }
+
+  body.is-dragging .canvas-wrap {
+    cursor: none;
+  }
+}
+
+.cursor,
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 95;
+  pointer-events: none;
+}
+
+.cursor {
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.25s, height 0.25s, margin 0.25s, background 0.25s, border-color 0.5s;
+}
+
+.cursor__label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0;
+  transition: opacity 0.25s, color 0.5s;
+}
+
+.cursor--drag .cursor__label {
+  opacity: 1;
+}
+
+.cursor--drag {
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+}
+
+.cursor--link {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  background: rgba(255, 90, 0, 0.14);
+  border-color: var(--accent);
+}
+
+.cursor-dot {
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor,
+  .cursor-dot {
+    display: none;
+  }
+}
+
+/* ---------- Scroll progress ---------- */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 60;
+  background: transparent;
+}
+
+.progress__fill {
+  height: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* ---------- Nav (difference blend survives the dark act) ---------- */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px clamp(20px, 4vw, 56px);
+  color: #fff;
+  mix-blend-mode: difference;
+  /* Own compositing layer — difference-blending over a live WebGL canvas
+     can otherwise flash/flicker in Chrome and Safari. */
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.nav__logo svg {
+  display: block;
+}
+
+.nav__links {
+  display: flex;
+  gap: 32px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav__links a {
+  opacity: 0.65;
+  transition: opacity 0.25s;
+}
+
+.nav__links a:hover {
+  opacity: 1;
+}
+
+.nav__cta {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  padding: 10px 22px;
+  transition: background 0.25s, color 0.25s;
+}
+
+.nav__cta:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* ---------- Sections ---------- */
+main {
+  position: relative;
+  z-index: 10;
+  pointer-events: none; /* let pointer reach the canvas… */
+}
+
+main a,
+main button,
+main img,
+.buy,
+.gallery figure {
+  pointer-events: auto; /* …except interactive bits */
+}
+
+.section {
+  min-height: 100vh;
+  padding: clamp(80px, 12vh, 140px) clamp(20px, 6vw, 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+/* ---------- Marquee ---------- */
+.marquee {
+  overflow: hidden;
+  padding: 3vh 0;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.marquee__track {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 96px);
+  text-transform: uppercase;
+  -webkit-text-stroke: 1.5px currentColor;
+  color: transparent;
+  animation: marquee 22s linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ---------- Reveal animation ---------- */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(36px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  align-items: center;
+  text-align: center;
+}
+
+.hero__eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(88px, 19vw, 300px);
+  line-height: 0.86;
+  letter-spacing: 0.01em;
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+  user-select: none;
+  will-change: transform;
+}
+
+.hero__sub {
+  max-width: 420px;
+  margin-top: 28px;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.hero__scroll {
+  position: absolute;
+  bottom: 34px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hero__scroll-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(7px); opacity: 0.4; }
+}
+
+/* ---------- Feature sections ---------- */
+.feature--left { align-items: flex-start; }
+.feature--right { align-items: flex-end; }
+
+.feature__body {
+  max-width: 440px;
+}
+
+.feature--right .feature__body {
+  text-align: right;
+}
+
+.feature__index {
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.3em;
+  color: var(--accent);
+}
+
+.feature__body h2 {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  margin: 14px 0 22px;
+  color: var(--ink);
+  will-change: transform;
+}
+
+.feature__body p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.feature__stats {
+  list-style: none;
+  display: flex;
+  gap: 44px;
+  margin-top: 34px;
+}
+
+.feature--right .feature__stats {
+  justify-content: flex-end;
+}
+
+.feature__stats strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(34px, 4vw, 52px);
+  color: var(--ink);
+}
+
+.feature__stats span {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- Finale ---------- */
+.finale {
+  justify-content: flex-end;
+  min-height: 160vh;
+  gap: 60px;
+}
+
+.finale__title {
+  font-family: var(--font-display);
+  font-size: clamp(44px, 8vw, 120px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 40vh;
+  color: var(--ink);
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.gallery figure {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.07);
+}
+
+.gallery img {
+  aspect-ratio: 1;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gallery figure:hover img {
+  transform: scale(1.06);
+}
+
+.gallery figcaption {
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+}
+
+/* ---------- Buy bar ---------- */
+.buy {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  background: #101010;
+  color: #fff;
+  border-radius: 22px;
+  padding: 26px clamp(24px, 4vw, 44px);
+}
+
+.buy__info h3 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.buy__info p {
+  font-size: 13px;
+  color: #9a9a9a;
+  margin-top: 4px;
+}
+
+.buy__price {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 34px;
+}
+
+.buy__btn {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--accent);
+  border: none;
+  border-radius: 999px;
+  padding: 16px 34px;
+  cursor: pointer;
+  color: #fff;
+  transition: transform 0.25s, background 0.25s;
+}
+
+.buy__btn:hover {
+  background: #ff7426;
+  transform: translateY(-2px);
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  padding-bottom: 10px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .nav__links { display: none; }
+
+  .gallery { grid-template-columns: repeat(2, 1fr); }
+
+  /* Text pins to the top of each act; the shoe performs in the
+     free space below it. */
+  .feature--left,
+  .feature--right {
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: clamp(90px, 13vh, 130px);
+  }
+
+  .feature--right .feature__body {
+    text-align: left;
+  }
+
+  .feature--right .feature__stats {
+    justify-content: flex-start;
+  }
+
+  .feature__body {
+    width: 100%;
+    max-width: 520px;
+    background: rgba(244, 244, 242, 0.86);
+    backdrop-filter: blur(8px);
+    border-radius: 18px;
+    padding: 24px;
+  }
+
+  .feature__body h2 {
+    font-size: clamp(40px, 10vw, 64px);
+    margin: 10px 0 16px;
+  }
+
+  .feature__body p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .feature__stats {
+    gap: 32px;
+    margin-top: 24px;
+  }
+
+  body.theme-dark .feature__body {
+    background: rgba(17, 17, 19, 0.78);
+  }
+
+  /* Hero: headline up top, shoe presented underneath */
+  .hero {
+    justify-content: flex-start;
+    padding-top: clamp(90px, 14vh, 150px);
+  }
+
+  .hero__sub {
+    max-width: 340px;
+    font-size: 15px;
+  }
+
+  .marquee { padding: 2vh 0; }
+
+  .finale {
+    min-height: 130vh;
+    gap: 44px;
+  }
+
+  .finale__title {
+    margin-top: 24vh;
+    font-size: clamp(40px, 10vw, 72px);
+  }
+
+  .buy {
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+
+  .buy__price { margin-left: 0; }
+
+  .buy__btn {
+    width: 100%;
+    padding: 16px 0;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    text-align: center;
+  }
+}
