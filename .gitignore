@@ -1,0 +1,9 @@
+node_modules/
+dist/
+
+# Generated debug/test artifacts
+site/screenshots/
+
+.DS_Store
+*.log
+.git-publish.sh
